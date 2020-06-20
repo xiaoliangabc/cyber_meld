@@ -30,7 +30,7 @@ Download data from [google driver](https://drive.google.com/file/d/1TfXMpyTRzB1V
 ```bash
 cd cyber_meld
 unzip kitti_lane_data.zip -d ./data/
-rm example_data.zip
+rm kitti_lane_data.zip
 ```
 
 ## Usage
