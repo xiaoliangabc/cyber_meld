@@ -50,10 +50,6 @@ class CommonUtils {
   void ProjectUpsample(const pcl::PointCloud<pcl::PointXYZ>::Ptr &in_cloud,
                        cv::Mat &in_image);
 
-  // Show detection result
-  void ShowDetectionResult(const cv::Mat &lane_bev_image,
-                           cv::Mat &raw_bev_image);
-
   cv::Point VeloPointToBEVImage(const pcl::PointXYZ &pt);
 
  private:

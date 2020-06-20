@@ -252,17 +252,6 @@ void CommonUtils::ProjectUpsample(
   DelaunayUpsampling(points, in_image);
 }
 
-void CommonUtils::ShowDetectionResult(const cv::Mat &lane_bev_image,
-                                      cv::Mat &raw_bev_image) {
-  for (int row = 0; row < lane_bev_image.rows; ++row) {
-    for (int col = 0; col < lane_bev_image.cols; ++col) {
-      if (lane_bev_image.at<uchar>(row, col) == 255) {
-        raw_bev_image.at<cv::Vec3b>(row, col)[1] = 255;
-      }
-    }
-  }
-}
-
 cv::Point CommonUtils::VeloPointToBEVImage(const pcl::PointXYZ &pt) {
   Eigen::MatrixXf trans_velo_to_bev_image =
       trans_road_to_bev_image_ * trans_cam_to_road_ * trans_velo_to_cam_;
