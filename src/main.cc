@@ -12,13 +12,9 @@
 #include "ego_lane_detection/feature_extraction.h"
 #include "ego_lane_detection/lane_segmentation.h"
 #include "ego_lane_detection/parameter_estimation.h"
-#include "ego_lane_detection/roi_selection.h"
 
 int frame_size = 95;
 
-// 3D point cloud
-std::string cloud_path;
-std::vector<std::string> cloud_files;
 // Raw per image
 std::string per_image_path;
 std::vector<std::string> per_image_files;
@@ -28,6 +24,9 @@ std::vector<std::string> calib_files;
 // OSM points
 std::string osm_path;
 std::vector<std::string> osm_files;
+// PLARD road detection result
+std::string plard_path;
+std::vector<std::string> plard_files;
 // Result
 std::string result_path;
 
@@ -60,12 +59,6 @@ void Run(const int& frame) {
   Timer timer;
   timer.start();
 
-  // Read point cloud data from file and generate index map
-  std::string cloud_file = cloud_path + cloud_files[frame];
-  pcl::PointCloud<pcl::PointXYZ>::Ptr raw_cloud(
-      new pcl::PointCloud<pcl::PointXYZ>);
-  cv::Mat index_map = common_utils.ReadPointCloud(cloud_file, raw_cloud);
-
   // Read raw per image
   std::string per_image_file = per_image_path + per_image_files[frame];
   cv::Mat raw_per_image =
@@ -79,24 +72,27 @@ void Run(const int& frame) {
   std::string osm_file = osm_path + osm_files[frame];
   Eigen::MatrixXf osm_points = common_utils.ReadOSMPoints(osm_file);
 
+  // Read PLARD road detection result
+  std::string plard_file = plard_path + plard_files[frame];
+  cv::Mat plard_per_image =
+      cv::imread(plard_file.c_str(), cv::IMREAD_GRAYSCALE);
+
   // Compute BEV look up table
   common_utils.ComputeBEVLookUpTable();
 
   // Transform per image to bev image
-  cv::Mat raw_bev_image;
+  cv::Mat raw_bev_image, plard_bev_image;
   common_utils.PerspectiveToBEV(raw_per_image, raw_bev_image);
+  common_utils.PerspectiveToBEV(plard_per_image, plard_bev_image);
 
-  // ROI selection
-  ROISelection roi_selection(common_utils);
-  cv::Mat roi_bev_image, vertical_slope_map;
-  roi_selection.Selection(raw_cloud, index_map, raw_per_image.size(),
-                          roi_bev_image, vertical_slope_map);
+  // Binary plard image
+  cv::threshold(plard_bev_image, plard_bev_image, 150, 255, CV_THRESH_BINARY);
 
   // Feature extraction
   FeatureExtraction feature_extraction;
   pcl::PointCloud<pcl::PointXYZ>::Ptr feature_points(
       new pcl::PointCloud<pcl::PointXYZ>);
-  feature_extraction.Extraction(raw_bev_image, roi_bev_image, feature_points);
+  feature_extraction.Extraction(raw_bev_image, plard_bev_image, feature_points);
 
   // Parameter estimation
   ParameterEstimation parameter_estimation;
@@ -107,9 +103,8 @@ void Run(const int& frame) {
   LaneSegmentation lane_segmentation;
   cv::Mat lane_bev_image =
       cv::Mat::zeros(BEVImageHeight, BEVImageWidth, CV_8UC1);
-  lane_segmentation.Segmentation(common_utils, raw_cloud, index_map,
-                                 vertical_slope_map, roi_bev_image,
-                                 trans_osm_points, lane_bev_image);
+  lane_segmentation.Segmentation(plard_bev_image, trans_osm_points,
+                                 lane_bev_image);
 
   // Save result
   std::ostringstream file_number;
@@ -137,11 +132,6 @@ void BuildUpDataPath(const std::string& dataset) {
   int pos = project_path.find_last_of('/');
   project_path = project_path.substr(0, pos);
 
-  // Build up cloud path
-  cloud_path = project_path + "/data/" + dataset + "/velodyne/";
-  cloud_files = common_utils.GetPathFiles(cloud_path);
-  assert(cloud_files.size() == frame_size);
-
   // Build up per image path
   per_image_path = project_path + "/data/" + dataset + "/per_image/";
   per_image_files = common_utils.GetPathFiles(per_image_path);
@@ -156,6 +146,11 @@ void BuildUpDataPath(const std::string& dataset) {
   osm_path = project_path + "/data/" + dataset + "/osm/";
   osm_files = common_utils.GetPathFiles(osm_path);
   assert(osm_files.size() == frame_size);
+
+  // Build up PLARD path
+  plard_path = project_path + "/data/" + dataset + "/PLARD/";
+  plard_files = common_utils.GetPathFiles(plard_path);
+  assert(plard_files.size() == frame_size);
 
   // Build result path
   result_path = project_path + "/data/" + dataset + "/result/";

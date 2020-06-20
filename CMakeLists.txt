@@ -28,7 +28,6 @@ set(CMAKE_BUILD_TYPE "Release")
 add_executable(ego_lane_detection
   src/main.cc
   src/common_utils.cc
-  src/roi_selection.cc
   src/feature_extraction.cc
   src/parameter_estimation.cc
   src/lane_segmentation.cc
@@ -37,4 +36,3 @@ add_executable(ego_lane_detection
 ## Specify libraries to link a library or executable target against
 target_link_libraries(ego_lane_detection ${PCL_LIBRARIES})
 target_link_libraries(ego_lane_detection ${OpenCV_LIBRARIES})
-target_link_libraries(ego_lane_detection ${PROJECT_SOURCE_DIR}/lib/libfade2d.so)

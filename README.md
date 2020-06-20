@@ -1,6 +1,6 @@
 # Map-Enhanced Ego-Lane Detection in the Missing Feature Scenarios
 
-This repository provides the official implementation for "[Map-Enhanced Ego-Lane Detection in the Missing Feature Scenarios](https://ieeexplore.ieee.org/document/9110871?source=authoralert)".
+This repository provides the official implementation for "[Map-Enhanced Ego-Lane Detection in the Missing Feature Scenarios](https://ieeexplore.ieee.org/document/9110871?source=authoralert)". Unlike the original CYBERMELD method, we use PLARD's road detection results as ROI, which produce higher accuracy.
 
 ## Abstract
 
@@ -13,7 +13,6 @@ This code is implemented in C++ with the following packages:
 2. OpenCV
 3. Eigen3
 4. OpenMP
-5. [Fade2D](https://www.geom.at/fade25d/html/)
 
 ## Setup
 
@@ -38,6 +37,7 @@ rm kitti_lane_data.zip
 ### Build
 
 ```bash
+git checkout plard
 mkdir build
 cd build
 cmake ..
@@ -68,17 +68,13 @@ python evaluateRoad.py ../data/training/result/ ../data/training/gt_bev_image/
 The following information will be output to the console
 
 ```
-MaxF: 92.94 
-AvgPrec: 85.44 
-PRE_wp: 92.65 
-REC_wp: 93.24 
-FPR_wp: 1.14 
-FNR_wp: 6.76
+MaxF: 94.03
+AvgPrec: 86.44
+PRE_wp: 93.74
+REC_wp: 94.32
+FPR_wp: 0.97
+FNR_wp: 5.68
 ```
-
-## Other
-
-If you have GPU support, we highly recommend using PLARD's road detection results as ROI, which produce higher accuracy. For more information, please refer to the [plard](https://github.com/xiaoliangabc/cyber_meld/tree/plard) branch.
 
 ## Citation
 

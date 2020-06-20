@@ -17,10 +17,7 @@ class LaneSegmentation {
  public:
   LaneSegmentation();
 
-  void Segmentation(CommonUtils& common_utils,
-                    const pcl::PointCloud<pcl::PointXYZ>::Ptr& raw_cloud,
-                    const cv::Mat& index_map, const cv::Mat& vertical_slope_map,
-                    const cv::Mat& roi_bev_image,
+  void Segmentation(const cv::Mat& roi_bev_image,
                     const Eigen::MatrixXf& trans_osm_points,
                     cv::Mat& lane_bev_image);
 
@@ -31,20 +28,16 @@ class LaneSegmentation {
                      cv::Mat& lane_bev_image);
 
   // Lane prune using up edge
-  int UpEdgePrune(CommonUtils& common_utils,
-                  const Eigen::MatrixXf& trans_osm_points,
-                  const pcl::PointCloud<pcl::PointXYZ>::Ptr& raw_cloud,
-                  const cv::Mat& index_map, const cv::Mat& vertical_slope_map,
-                  cv::Mat& lane_bev_image);
+  int UpEdgePrune(const int& lane_width, cv::Mat& lane_bev_image);
 
   // Lane prune using right edge(road curb)
   int RightEdgePrune(const cv::Mat& roi_bev_image, const int& up_edge_row,
                      cv::Mat& lane_bev_image);
 
   // Lane completion for upper rows
-  void LaneCompletion(const Eigen::MatrixXf& trans_osm_points,
-                      const int& up_edge_row, const int& lane_width,
-                      cv::Mat& lane_bev_image);
+  void LaneCompletion(const cv::Mat& roi_bev_image,
+                      const Eigen::MatrixXf& trans_osm_points,
+                      const int& lane_width, cv::Mat& lane_bev_image);
 };
 
 #endif  // EGO_LANE_DETECTION_LANE_SEGMENTATION_H_

@@ -46,7 +46,7 @@ void FeatureExtraction::GenerateMask(cv::Mat &mask_image) {
     // Compute road width
     int road_width = end_col - start_col;
     // Compute erode width
-    int erode_width = road_width * 0.35;
+    int erode_width = road_width * 0.3;
     if (erode_width < 30) erode_width = 30;
     // Erode
     for (int col = start_col;
