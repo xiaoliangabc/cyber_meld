@@ -92,6 +92,7 @@ If you find this work useful, please cite:
   year={2020},
   volume={8},
   pages={107958-107968}
+}
 ```
 
 ## Acknowledgement
